@@ -3,6 +3,9 @@
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\PoliController;
+use App\Http\Controllers\Admin\DokterController;
+use App\Http\Controllers\Admin\PasienController;
+use App\Http\Controllers\Admin\ObatController;
 
 Route::get('/', function () {
     return redirect()->route('login'); // ⬅️ FIX
@@ -21,6 +24,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     })->name('admin.dashboard');
 
     Route::resource('polis', PoliController::class);
+    Route::resource('dokter', DokterController::class);
+    Route::resource('pasien', PasienController::class);
+    Route::resource('obat', ObatController::class);
 });
 
 // DOKTER
