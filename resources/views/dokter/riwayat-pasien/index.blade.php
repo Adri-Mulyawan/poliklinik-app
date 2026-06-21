@@ -36,7 +36,7 @@
                             </td>
 
                             <td class="px-6 py-4 font-semibold text-slate-800">
-                                {{ $riwayat->daftarPoli->pasien->nama }}
+                                {{ $riwayat->daftarPoli->pasien->name }}
                             </td>
 
                             <td class="px-6 py-4 text-slate-500">

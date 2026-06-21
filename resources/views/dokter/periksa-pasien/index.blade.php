@@ -7,13 +7,7 @@
         </h2>
     </div>
 
-    {{-- Alert Flash Message --}}
-    @if (session('message'))
-    <div class="alert alert-{{ session('type') ?? 'success' }} mb-4 rounded-xl shadow-sm" role="alert">
-        <i class="fas fa-{{ session('type') == 'danger' ? 'circle-xmark' : 'circle-check' }}"></i>
-        <span>{{ session('message') }}</span>
-    </div>
-    @endif
+    {{-- Alert sudah ditangani secara global di x-layouts.app --}}
 
     {{-- Card --}}
     <div class="card bg-base-100 shadow-md rounded-2 border">
@@ -43,7 +37,7 @@
                             </td>
 
                             <td class="px-6 py-4 font-semibold text-slate-800">
-                                {{ $dp->pasien->nama }}
+                                {{ $dp->pasien->name }}
                             </td>
 
                             <td class="px-6 py-4 text-slate-500">

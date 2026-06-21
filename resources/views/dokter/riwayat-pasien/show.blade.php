@@ -23,7 +23,7 @@
                 <div class="px-6 py-5 flex flex-col gap-3 text-sm">
                     <div class="flex gap-2">
                         <span class="w-36 text-slate-500 font-medium">Nama Pasien</span>
-                        <span class="text-slate-800 font-semibold">{{ $periksa->daftarPoli->pasien->nama }}</span>
+                        <span class="text-slate-800 font-semibold">{{ $periksa->daftarPoli->pasien->name }}</span>
                     </div>
                     <div class="flex gap-2">
                         <span class="w-36 text-slate-500 font-medium">No. Antrian</span>
@@ -41,7 +41,7 @@
                     </div>
                     <div class="flex gap-2">
                         <span class="w-36 text-slate-500 font-medium">Dokter</span>
-                        <span class="text-slate-800">{{ $periksa->daftarPoli->jadwalPeriksa->dokter->nama }}</span>
+                        <span class="text-slate-800">{{ $periksa->daftarPoli->jadwalPeriksa->dokter->name }}</span>
                     </div>
                     <div class="flex gap-2">
                         <span class="w-36 text-slate-500 font-medium">Tanggal Periksa</span>

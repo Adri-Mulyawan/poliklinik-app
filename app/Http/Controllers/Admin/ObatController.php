@@ -23,14 +23,16 @@ class ObatController extends Controller
     {
         $request->validate([
             'nama_obat' => 'required|string',
-            'kemasan' => 'required|string',
-            'harga' => 'required|integer',
+            'kemasan'   => 'required|string',
+            'harga'     => 'required|integer|min:0',
+            'stok'      => 'required|integer|min:0',
         ]);
 
         Obat::create([
             'nama_obat' => $request->nama_obat,
-            'kemasan' => $request->kemasan,
-            'harga' => $request->harga
+            'kemasan'   => $request->kemasan,
+            'harga'     => $request->harga,
+            'stok'      => $request->stok,
         ]);
 
         return redirect()->route('obat.index')
@@ -50,15 +52,17 @@ class ObatController extends Controller
     {
         $request->validate([
             'nama_obat' => 'required|string',
-            'kemasan' => 'nullable|string',
-            'harga' => 'required|integer',
+            'kemasan'   => 'nullable|string',
+            'harga'     => 'required|integer|min:0',
+            'stok'      => 'required|integer|min:0',
         ]);
 
         $obat = Obat::findOrFail($id);
         $obat->update([
             'nama_obat' => $request->nama_obat,
-            'kemasan' => $request->kemasan,
-            'harga' => $request->harga
+            'kemasan'   => $request->kemasan,
+            'harga'     => $request->harga,
+            'stok'      => $request->stok,
         ]);
 
         return redirect()->route('obat.index')

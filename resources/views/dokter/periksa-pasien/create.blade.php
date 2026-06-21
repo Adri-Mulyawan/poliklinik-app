@@ -12,6 +12,25 @@
         </h2>
     </div>
 
+    {{-- Error Flash --}}
+    @if (session('error'))
+    <div class="alert alert-error mb-4 rounded-xl shadow-sm" role="alert">
+        <i class="fas fa-circle-xmark"></i>
+        <span>{{ session('error') }}</span>
+    </div>
+    @endif
+
+    @if ($errors->any())
+    <div class="alert alert-error mb-4 rounded-xl shadow-sm" role="alert">
+        <i class="fas fa-circle-xmark"></i>
+        <ul class="list-disc list-inside text-sm">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
     {{-- Card --}}
     <div class="card bg-base-100 shadow-sm rounded-2xl border border-slate-200">
         <div class="card-body p-8">
@@ -30,16 +49,27 @@
                         @foreach ($obats as $obat)
                             <option value="{{ $obat->id }}"
                                 data-nama="{{ $obat->nama_obat }}"
-                                data-harga="{{ $obat->harga }}">
-                                {{ $obat->nama_obat }} - Rp{{ number_format($obat->harga) }}
+                                data-harga="{{ $obat->harga }}"
+                                data-stok="{{ $obat->stok }}">
+                                {{ $obat->nama_obat }}
+                                ({{ $obat->kemasan ?? '-' }})
+                                — Rp{{ number_format($obat->harga) }}
+                                — Stok: {{ $obat->stok }}
+                                @if ($obat->stok <= 5)
+                                    ⚠️ Menipis
+                                @endif
                             </option>
                         @endforeach
                     </select>
+                    <p class="text-xs text-slate-400 mt-1">
+                        <i class="fas fa-info-circle"></i>
+                        Hanya obat dengan stok tersedia yang ditampilkan. Obat habis tidak bisa dipilih.
+                    </p>
                 </div>
 
                 {{-- Obat Terpilih --}}
                 <div class="form-control mb-5">
-                    <label class="label pb-1 ">
+                    <label class="label pb-1">
                         <span class="text-sm font-semibold text-gray-700">Obat Terpilih</span>
                     </label>
 
@@ -52,11 +82,15 @@
                 {{-- Total Harga --}}
                 <div class="form-control mb-5">
                     <label class="label pb-1">
-                        <span class="text-sm font-semibold text-gray-700">Total Harga</span>
+                        <span class="text-sm font-semibold text-gray-700">Total Harga Obat</span>
                     </label>
                     <div class="input input-bordered w-full rounded-lg flex items-center bg-slate-50 text-slate-700 font-bold" id="total-harga">
                         Rp 0
                     </div>
+                    <p class="text-xs text-slate-400 mt-1">
+                        <i class="fas fa-info-circle"></i>
+                        Total biaya periksa = harga obat + Rp 150.000 (biaya administrasi)
+                    </p>
                 </div>
 
                 {{-- Catatan --}}
@@ -71,7 +105,7 @@
 
                 {{-- Buttons --}}
                 <div class="flex gap-3">
-                    <button type="submit"
+                    <button type="submit" id="btn-simpan"
                         class="btn bg-[#2d4499] hover:bg-[#1e2d6b] text-white border-none rounded-lg px-6">
                         <i class="fas fa-save"></i>
                         Simpan
@@ -87,23 +121,38 @@
     </div>
 
     <script>
-        const selectObat = document.getElementById('select-obat');
-        const listObat = document.getElementById('obat-terpilih');
-        const inputBiaya = document.getElementById('biaya_periksa');
+        const selectObat    = document.getElementById('select-obat');
+        const listObat      = document.getElementById('obat-terpilih');
+        const inputBiaya    = document.getElementById('biaya_periksa');
         const inputObatJson = document.getElementById('obat_json');
-        const totalHargaEl = document.getElementById('total-harga');
+        const totalHargaEl  = document.getElementById('total-harga');
 
         let daftarObat = [];
 
         selectObat.addEventListener('change', () => {
             const selectedOption = selectObat.options[selectObat.selectedIndex];
-            const id = selectedOption.value;
-            const nama = selectedOption.dataset.nama;
+            const id    = selectedOption.value;
+            const nama  = selectedOption.dataset.nama;
             const harga = parseInt(selectedOption.dataset.harga || 0);
+            const stok  = parseInt(selectedOption.dataset.stok || 0);
 
-            if (!id || daftarObat.some(o => o.id == id)) return;
+            if (!id) return;
 
-            daftarObat.push({ id, nama, harga });
+            // Cek apakah sudah dipilih
+            if (daftarObat.some(o => o.id == id)) {
+                alert(`Obat "${nama}" sudah ditambahkan.`);
+                selectObat.selectedIndex = 0;
+                return;
+            }
+
+            // Cek stok (frontend guard)
+            if (stok <= 0) {
+                alert(`Stok obat "${nama}" habis! Tidak bisa dipilih.`);
+                selectObat.selectedIndex = 0;
+                return;
+            }
+
+            daftarObat.push({ id, nama, harga, stok });
             renderObat();
             selectObat.selectedIndex = 0;
         });
@@ -115,10 +164,17 @@
             daftarObat.forEach((obat, index) => {
                 total += obat.harga;
 
+                const stokLabel = obat.stok <= 5
+                    ? `<span class="text-amber-500 text-xs ml-1"><i class="fas fa-triangle-exclamation"></i> Stok ${obat.stok}</span>`
+                    : `<span class="text-green-500 text-xs ml-1"><i class="fas fa-circle-check"></i> Stok ${obat.stok}</span>`;
+
                 const item = document.createElement('li');
                 item.className = 'flex items-center justify-between px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700';
                 item.innerHTML = `
-                    <span>${obat.nama} — <span class="font-semibold">Rp ${obat.harga.toLocaleString()}</span></span>
+                    <span>
+                        ${obat.nama} — <span class="font-semibold">Rp ${obat.harga.toLocaleString()}</span>
+                        ${stokLabel}
+                    </span>
                     <button type="button"
                         onclick="hapusObat(${index})"
                         class="btn btn-sm bg-red-500 hover:bg-red-600 text-white border-none rounded-lg px-3">
@@ -128,9 +184,9 @@
                 listObat.appendChild(item);
             });
 
-            inputBiaya.value = total;
+            inputBiaya.value     = total;
             totalHargaEl.textContent = `Rp ${total.toLocaleString()}`;
-            inputObatJson.value = JSON.stringify(daftarObat.map(o => o.id));
+            inputObatJson.value  = JSON.stringify(daftarObat.map(o => o.id));
         }
 
         function hapusObat(index) {

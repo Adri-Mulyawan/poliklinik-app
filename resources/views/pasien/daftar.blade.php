@@ -106,25 +106,35 @@
     <script>
         document.addEventListener("DOMContentLoaded", function(){
 
-    const poliSelect = document.getElementById("poliSelect")
-    const jadwalSelect = document.getElementById("jadwalSelect")
-    const jadwalOptions = jadwalSelect.querySelectorAll("option")
+            const poliSelect = document.getElementById("poliSelect")
+            const jadwalSelect = document.getElementById("jadwalSelect")
+            const jadwalOptions = jadwalSelect.querySelectorAll("option")
 
-    poliSelect.addEventListener("change", function(){
-        let poliId = this.value
-        jadwalOptions.forEach(option => {
-            if(option.value === ""){
-                option.style.display = "block"
-                return
+            poliSelect.addEventListener("change", function(){
+                let poliId = this.value
+                jadwalOptions.forEach(option => {
+                    if(option.value === ""){
+                        option.style.display = "block"
+                        return
+                    }
+                    if(option.dataset.poli === poliId){
+                        option.style.display = "block"
+                    }else{
+                        option.style.display = "none"
+                    }
+                })
+                jadwalSelect.value = ""
+            })
+
+            // Hilangkan toast setelah 3 detik
+            const toast = document.getElementById('toastSuccess');
+            if (toast) {
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => toast.remove(), 500);
+                }, 3000);
             }
-            if(option.dataset.poli === poliId){
-                option.style.display = "block"
-            }else{
-                option.style.display = "none"
-            }
-        })
-        jadwalSelect.value = ""
-    })
         })
     </script>
     @endpush
